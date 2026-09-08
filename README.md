@@ -1,6 +1,5 @@
 # ResQMeal: Production-Grade Food Surplus Reduction Platform
 
-[![CI/CD](https://github.com/kritanlamichhane/ResQMeal/actions/workflows/ci.yml/badge.svg)](https://github.com/kritanlamichhane/ResQMeal/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com)
 [![Next.js 14](https://img.shields.io/badge/Frontend-Next.js%2014-black.svg?logo=next.js)](https://nextjs.org)
