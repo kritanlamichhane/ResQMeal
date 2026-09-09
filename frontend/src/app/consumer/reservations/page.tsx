@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Reservation } from '@/types';
 import { useAuth } from '@/lib/auth-context';
-import { Clock, MapPin, CheckCircle2, AlertCircle, QrCode, Ban, ArrowRight } from 'lucide-react';
+import { Clock, MapPin, CheckCircle2, Ban, ArrowRight, ReceiptText } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ConsumerReservationsPage() {
@@ -26,42 +26,42 @@ export default function ConsumerReservationsPage() {
   }, []);
 
   const handleCancel = async (id: number) => {
-    if (!confirm('Are you sure you want to cancel this reservation? The inventory will be released immediately.')) return;
+    if (!confirm('Are you sure you want to cancel this order? The items will be returned to store inventory immediately.')) return;
     try {
       await api.cancelReservation(id, 'User requested cancellation');
       loadReservations();
     } catch (err: any) {
-      setActionError(err.message || 'Failed to cancel reservation.');
+      setActionError(err.message || 'Failed to cancel order.');
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'CONFIRMED':
-        return <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold">Confirmed / Ready for Pickup</span>;
+        return <span className="px-3 py-1 bg-[#E8F8EE] text-[#05944F] rounded-full text-xs font-bold">Ready for Pickup</span>;
       case 'COMPLETED':
-        return <span className="px-2.5 py-1 bg-blue-100 text-blue-800 rounded-lg text-xs font-bold">Collected & Rescued</span>;
+        return <span className="px-3 py-1 bg-neutral-100 text-neutral-800 rounded-full text-xs font-bold">Collected</span>;
       case 'CANCELLED':
-        return <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-bold">Cancelled</span>;
+        return <span className="px-3 py-1 bg-neutral-100 text-neutral-500 rounded-full text-xs font-bold">Cancelled</span>;
       case 'EXPIRED':
-        return <span className="px-2.5 py-1 bg-rose-100 text-rose-800 rounded-lg text-xs font-bold">Expired</span>;
+        return <span className="px-3 py-1 bg-rose-50 text-rose-700 rounded-full text-xs font-bold">Expired</span>;
       default:
-        return <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-bold">{status}</span>;
+        return <span className="px-3 py-1 bg-neutral-100 text-neutral-800 rounded-full text-xs font-bold">{status}</span>;
     }
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
       
       <div className="mb-8">
-        <h1 className="text-3xl font-black text-gray-900">My Food Pickups</h1>
-        <p className="text-xs text-gray-500 mt-1">
-          Present your digital pickup code at the counter during the pickup window.
+        <h1 className="text-3xl font-black text-black tracking-tight">Your Food Orders</h1>
+        <p className="text-xs text-neutral-500 font-medium mt-1">
+          Present your pickup code at the counter during the collection window.
         </p>
       </div>
 
       {actionError && (
-        <div className="p-3 mb-6 bg-red-50 text-red-700 rounded-2xl text-xs font-bold border border-red-200">
+        <div className="p-3 mb-6 bg-rose-50 text-rose-800 rounded-2xl text-xs font-bold border border-rose-200">
           {actionError}
         </div>
       )}
@@ -69,52 +69,52 @@ export default function ConsumerReservationsPage() {
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2].map((n) => (
-            <div key={n} className="h-40 bg-gray-100 rounded-2xl animate-pulse" />
+            <div key={n} className="h-40 bg-neutral-100 rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : reservations.length > 0 ? (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {reservations.map((res) => {
             const isConfirmed = res.status === 'CONFIRMED' || res.status === 'READY_FOR_PICKUP';
             return (
               <div
                 key={res.id}
-                className="bg-white rounded-3xl border border-gray-100 shadow-md p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 hover:border-emerald-200 transition-all"
+                className="bg-white rounded-2xl border border-neutral-200/80 hover:border-black transition-all p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm"
               >
                 {/* Info */}
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     {getStatusBadge(res.status)}
-                    <span className="text-xs text-gray-400">
-                      Reserved on {new Date(res.created_at).toLocaleDateString()}
+                    <span className="text-xs text-neutral-400 font-medium">
+                      {new Date(res.created_at).toLocaleDateString()}
                     </span>
                   </div>
 
-                  <h2 className="text-xl font-black text-gray-900">
+                  <h2 className="text-xl font-black text-black tracking-tight">
                     {res.listing?.title || 'Surplus Meal Package'}
                   </h2>
 
-                  <p className="text-xs font-semibold text-gray-500 mt-0.5">
-                    {res.listing?.provider?.business_name || 'Restaurant Partner'} • {res.listing?.provider?.address || 'Bangalore'}
+                  <p className="text-xs font-semibold text-neutral-500 mt-0.5">
+                    {res.listing?.provider?.business_name || 'Kitchen Partner'} • {res.listing?.provider?.address || 'Bangalore'}
                   </p>
 
-                  <div className="flex items-center gap-4 mt-3 text-xs text-gray-600 font-medium">
-                    <span>Quantity: <strong>{res.quantity} portions</strong></span>
-                    <span>Total Paid: <strong>₹{res.total_price}</strong></span>
-                    <span className="flex items-center gap-1 text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md font-bold">
-                      <Clock className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-4 mt-3 text-xs text-neutral-700 font-medium">
+                    <span>Quantity: <strong className="text-black">{res.quantity} portions</strong></span>
+                    <span>Total: <strong className="text-black">₹{res.total_price}</strong></span>
+                    <span className="flex items-center gap-1 text-black font-semibold bg-neutral-100 px-2 py-0.5 rounded-md">
+                      <Clock className="w-3.5 h-3.5 text-neutral-500" />
                       Pickup Deadline: {new Date(res.expires_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                 </div>
 
-                {/* Pickup Code Voucher Card */}
+                {/* Pickup Code Card (Uber Voucher Style) */}
                 <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-                  <div className="bg-emerald-50/70 border-2 border-dashed border-emerald-300 rounded-2xl px-5 py-3 text-center w-full sm:w-auto">
-                    <span className="text-[10px] uppercase font-extrabold text-emerald-800 tracking-wider block">
-                      Pickup Voucher
+                  <div className="bg-neutral-50 border border-neutral-200 rounded-2xl px-5 py-3 text-center w-full sm:w-auto">
+                    <span className="text-[10px] uppercase font-extrabold text-neutral-400 tracking-widest block">
+                      Voucher Code
                     </span>
-                    <div className="text-xl font-mono font-black text-emerald-700 tracking-wider">
+                    <div className="text-2xl font-mono font-black text-black tracking-wider">
                       {res.pickup_code}
                     </div>
                   </div>
@@ -122,9 +122,9 @@ export default function ConsumerReservationsPage() {
                   {isConfirmed && (
                     <button
                       onClick={() => handleCancel(res.id)}
-                      className="px-3.5 py-2.5 text-xs font-bold text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors flex items-center gap-1 w-full sm:w-auto justify-center"
+                      className="px-4 py-2.5 text-xs font-bold text-neutral-500 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-colors flex items-center gap-1 w-full sm:w-auto justify-center"
                     >
-                      <Ban className="w-3.5 h-3.5" /> Cancel
+                      <Ban className="w-3.5 h-3.5" /> Cancel Order
                     </button>
                   )}
                 </div>
@@ -134,19 +134,19 @@ export default function ConsumerReservationsPage() {
           })}
         </div>
       ) : (
-        <div className="text-center py-16 bg-white rounded-3xl border border-gray-100 p-8">
-          <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
-            <Clock className="w-8 h-8" />
+        <div className="text-center py-20 bg-neutral-50 rounded-3xl border border-neutral-200 p-8">
+          <div className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center mx-auto mb-4 border border-neutral-200 shadow-sm">
+            <ReceiptText className="w-6 h-6" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-1">No reservations yet</h3>
-          <p className="text-xs text-gray-500 max-w-sm mx-auto mb-5">
-            Discover fresh surplus meals near you and save money while preventing food waste.
+          <h3 className="text-lg font-black text-black mb-1">No orders yet</h3>
+          <p className="text-xs text-neutral-500 max-w-sm mx-auto mb-5 font-medium">
+            Explore discounted surplus food from restaurants and bakeries near you.
           </p>
           <Link
             href="/consumer/dashboard"
-            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md inline-flex items-center gap-1.5"
+            className="px-6 py-3 bg-black hover:bg-neutral-800 text-white text-xs font-bold rounded-full transition-all inline-flex items-center gap-2 shadow-md"
           >
-            Find Nearby Food <ArrowRight className="w-4 h-4" />
+            Find Food Deals <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       )}

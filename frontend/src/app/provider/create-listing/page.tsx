@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { FoodCategory, ListingType } from '@/types';
-import { Sparkles, ArrowRight, Zap, Image as ImageIcon, CheckCircle, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Sparkles, ArrowRight, Zap, CheckCircle, ShieldCheck } from 'lucide-react';
 
 export default function CreateListingPage() {
   const router = useRouter();
@@ -20,7 +20,6 @@ export default function CreateListingPage() {
   const [isVegetarian, setIsVegetarian] = useState(true);
   const [imageUrl, setImageUrl] = useState('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600');
 
-  // Timestamps
   const now = new Date();
   const defaultStart = new Date(now.getTime() + 15 * 60000).toISOString().slice(0, 16);
   const defaultEnd = new Date(now.getTime() + 180 * 60000).toISOString().slice(0, 16);
@@ -122,34 +121,36 @@ export default function CreateListingPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
       
-      <div className="mb-6">
-        <span className="text-emerald-600 font-extrabold text-xs uppercase tracking-wider">
-          Surplus Reduction Portal
+      <div className="mb-8">
+        <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest">
+          Merchant Inventory Manager
         </span>
-        <h1 className="text-3xl font-black text-gray-900">List Surplus Food</h1>
-        <p className="text-xs text-gray-500 mt-1">
-          Turn surplus meals into community meals and prevent carbon emissions.
+        <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight mt-0.5">
+          List Surplus Food
+        </h1>
+        <p className="text-xs text-neutral-500 font-medium mt-1">
+          Turn surplus batches into sales and prevent edible meals from reaching landfills.
         </p>
       </div>
 
       {error && (
-        <div className="p-3 mb-6 bg-red-50 text-red-700 rounded-2xl text-xs font-bold border border-red-200">
+        <div className="p-3 mb-6 bg-rose-50 text-rose-800 rounded-2xl text-xs font-bold border border-rose-200">
           {error}
         </div>
       )}
 
-      {/* AI Assistant #3: Food Image Assistant */}
-      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 rounded-3xl p-6 mb-8 shadow-sm">
-        <div className="flex items-center gap-2 mb-2">
-          <Sparkles className="w-5 h-5 text-emerald-600" />
-          <h2 className="text-base font-extrabold text-gray-900">
+      {/* AI Assistant #3: Food Image Assistant (Uber Style) */}
+      <div className="bg-neutral-50 border border-neutral-200 rounded-3xl p-6 sm:p-7 mb-8">
+        <div className="flex items-center gap-2 mb-1.5">
+          <Sparkles className="w-5 h-5 text-black" />
+          <h2 className="text-base font-black text-black">
             AI Food Image & Metadata Assistant
           </h2>
         </div>
-        <p className="text-xs text-gray-600 mb-4 max-w-xl">
-          Enter image cues or food keywords (e.g. &ldquo;croissants&rdquo;, &ldquo;paneer biryani&rdquo;) to automatically detect category, diet labels, and portion hints.
+        <p className="text-xs text-neutral-600 mb-4 font-medium">
+          Enter item keywords (e.g. &ldquo;chocolate croissants&rdquo;, &ldquo;paneer biryani&rdquo;) to automatically classify category, diet labels, and portion suggestions.
         </p>
 
         <div className="flex gap-2">
@@ -157,66 +158,65 @@ export default function CreateListingPage() {
             type="text"
             value={imageHint}
             onChange={(e) => setImageHint(e.target.value)}
-            placeholder="e.g. 8 freshly baked chocolate croissants from morning batch"
-            className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            placeholder="e.g. 8 freshly baked croissants from morning batch"
+            className="flex-1 px-4 py-3 rounded-xl border border-neutral-200 text-sm bg-white font-medium focus:outline-none focus:border-black"
           />
           <button
             type="button"
             onClick={handleExtractImage}
             disabled={isExtractingImage || !imageHint.trim()}
-            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all disabled:opacity-50 flex items-center gap-1.5"
+            className="px-5 py-3 bg-black hover:bg-neutral-800 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 flex items-center gap-1.5 flex-shrink-0"
           >
-            {isExtractingImage ? 'Extracting...' : <>Analyze Food</>}
+            {isExtractingImage ? 'Analyzing...' : <>Analyze Food</>}
           </button>
         </div>
 
-        {/* AI Confirmation Dialog (Mandatory human-in-the-loop) */}
         {extractedData && (
-          <div className="mt-4 p-4 bg-white rounded-2xl border border-emerald-200 shadow-sm animate-in fade-in">
+          <div className="mt-4 p-4 bg-white rounded-2xl border border-neutral-200 animate-in fade-in">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-black text-emerald-800 uppercase tracking-wide">
-                AI Detected Attributes (Confidence: {Math.round(extractedData.confidence_score * 100)}%)
+              <span className="text-xs font-black text-black uppercase tracking-wide">
+                Detected Attributes ({Math.round(extractedData.confidence_score * 100)}% Confidence)
               </span>
-              <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md font-bold">
-                Provider Review Required
+              <span className="text-[10px] bg-neutral-100 text-neutral-800 px-2 py-0.5 rounded-md font-bold">
+                Review Required
               </span>
             </div>
-            <p className="text-xs text-gray-700 mb-3">
-              Suggested: <strong>{extractedData.detected_name}</strong> • Category: <strong>{extractedData.category}</strong> • Diet: <strong>{extractedData.is_vegetarian ? 'Veg' : 'Non-Veg'}</strong>
+            <p className="text-xs text-neutral-700 mb-3">
+              Name: <strong>{extractedData.detected_name}</strong> • Category: <strong>{extractedData.category}</strong> • Diet: <strong>{extractedData.is_vegetarian ? 'Pure Veg' : 'Non-Veg'}</strong>
             </p>
             <button
               type="button"
               onClick={applyExtractedData}
-              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg flex items-center gap-1 shadow-sm"
+              className="px-4 py-2 bg-black hover:bg-neutral-800 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-sm"
             >
-              <CheckCircle className="w-3.5 h-3.5" /> Confirm & Auto-Fill Form
+              <CheckCircle className="w-3.5 h-3.5 text-[#06C167]" /> Apply to Form
             </button>
           </div>
         )}
       </div>
 
       {/* Main Listing Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-xl space-y-6">
+      <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-6 sm:p-8 border border-neutral-200 shadow-sm space-y-6">
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
-            <label className="block text-xs font-bold text-gray-700 mb-1">Listing Title</label>
+            <label className="block text-xs font-bold text-black mb-1.5">Listing Title</label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Artisan Butter Croissants & Danish Box"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-sm font-semibold text-black focus:outline-none focus:bg-white focus:border-black"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">Category</label>
+            <label className="block text-xs font-bold text-black mb-1.5">Category</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value as FoodCategory)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-xs font-bold text-black focus:outline-none focus:bg-white focus:border-black"
             >
               <option value="MEALS">Meals / Cooked Platters</option>
               <option value="BAKERY">Bakery & Pastries</option>
@@ -227,11 +227,11 @@ export default function CreateListingPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">Listing Type</label>
+            <label className="block text-xs font-bold text-black mb-1.5">Listing Type</label>
             <select
               value={listingType}
               onChange={(e) => setListingType(e.target.value as ListingType)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-xs font-bold text-black focus:outline-none focus:bg-white focus:border-black"
             >
               <option value="SALE">Discounted Sale (Consumers & Public)</option>
               <option value="DONATION">Free Donation (NGOs & Shelters Only)</option>
@@ -239,117 +239,117 @@ export default function CreateListingPage() {
           </div>
         </div>
 
-        {/* Quantity and Pricing with AI Smart Pricing button */}
-        <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-4">
+        {/* Quantity and Pricing with Uber Style Smart Pricing button */}
+        <div className="p-5 bg-neutral-50 rounded-2xl border border-neutral-200 space-y-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Quantity</label>
+              <label className="block text-xs font-bold text-black mb-1">Quantity</label>
               <input
                 type="number"
                 min="1"
                 required
                 value={quantity}
                 onChange={(e) => setQuantity(Number(e.target.value))}
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 rounded-xl bg-white border border-neutral-200 text-sm font-semibold text-black focus:outline-none focus:border-black"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Unit</label>
+              <label className="block text-xs font-bold text-black mb-1">Unit</label>
               <input
                 type="text"
                 value={unit}
                 onChange={(e) => setUnit(e.target.value)}
-                placeholder="portions / boxes"
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="portions"
+                className="w-full px-3 py-2 rounded-xl bg-white border border-neutral-200 text-sm font-semibold text-black focus:outline-none focus:border-black"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Original Price (₹)</label>
+              <label className="block text-xs font-bold text-black mb-1">Regular Price (₹)</label>
               <input
                 type="number"
                 min="0"
                 required
                 value={originalPrice}
                 onChange={(e) => setOriginalPrice(Number(e.target.value))}
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 rounded-xl bg-white border border-neutral-200 text-sm font-semibold text-black focus:outline-none focus:border-black"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Surplus Price (₹)</label>
+              <label className="block text-xs font-bold text-black mb-1">Surplus Price (₹)</label>
               <input
                 type="number"
                 min="0"
                 disabled={listingType === 'DONATION'}
                 value={listingType === 'DONATION' ? 0 : surplusPrice}
                 onChange={(e) => setSurplusPrice(Number(e.target.value))}
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-100"
+                className="w-full px-3 py-2 rounded-xl bg-white border border-neutral-200 text-sm font-semibold text-black focus:outline-none focus:border-black disabled:bg-neutral-100"
               />
             </div>
           </div>
 
           {/* AI Feature #2: Smart Pricing button */}
           {listingType === 'SALE' && (
-            <div className="pt-2 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-              <span className="text-xs text-gray-500">
-                Unsure what to charge? Let our algorithm calculate dynamic time-decay pricing.
+            <div className="pt-3 border-t border-neutral-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <span className="text-xs text-neutral-500 font-medium">
+                Compute algorithmic time-decay pricing based on remaining hours and stock pressure.
               </span>
               <button
                 type="button"
                 onClick={handleSmartPricing}
                 disabled={isCalculatingPricing}
-                className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 flex-shrink-0"
+                className="px-4 py-2 bg-black hover:bg-neutral-800 text-white rounded-full text-xs font-bold transition-all flex items-center gap-1.5 flex-shrink-0"
               >
-                <Zap className="w-3.5 h-3.5" />
-                {isCalculatingPricing ? 'Computing...' : 'AI Smart Pricing'}
+                <Zap className="w-3.5 h-3.5 text-[#06C167]" />
+                {isCalculatingPricing ? 'Computing...' : 'AI Dynamic Pricing'}
               </button>
             </div>
           )}
 
           {pricingRationale && (
-            <div className="p-3 bg-amber-50 text-amber-900 rounded-xl text-xs border border-amber-200 font-medium">
+            <div className="p-3 bg-white text-black rounded-xl text-xs border border-neutral-200 font-medium">
               {pricingRationale}
             </div>
           )}
         </div>
 
-        {/* Timestamps & Food Safety Requirements */}
+        {/* Food Safety & Pickup Timestamps */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span className="text-xs font-extrabold text-gray-900 uppercase tracking-wider">
-              Food Safety & Pickup Windows
+            <ShieldCheck className="w-4 h-4 text-black" />
+            <span className="text-xs font-black text-black uppercase tracking-wider">
+              Pickup Window & Expiry Timestamps
             </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Pickup Start</label>
+              <label className="block text-xs font-bold text-black mb-1">Pickup Starts</label>
               <input
                 type="datetime-local"
                 required
                 value={pickupStart}
                 onChange={(e) => setPickupStart(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2.5 rounded-xl bg-neutral-100 border border-neutral-200 text-xs font-semibold text-black focus:outline-none focus:bg-white focus:border-black"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Pickup Deadline</label>
+              <label className="block text-xs font-bold text-black mb-1">Pickup Deadline</label>
               <input
                 type="datetime-local"
                 required
                 value={pickupEnd}
                 onChange={(e) => setPickupEnd(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2.5 rounded-xl bg-neutral-100 border border-neutral-200 text-xs font-semibold text-black focus:outline-none focus:bg-white focus:border-black"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Best Before / Expiry</label>
+              <label className="block text-xs font-bold text-black mb-1">Best Before / Expiry</label>
               <input
                 type="datetime-local"
                 required
                 value={expiryTime}
                 onChange={(e) => setExpiryTime(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2.5 rounded-xl bg-neutral-100 border border-neutral-200 text-xs font-semibold text-black focus:outline-none focus:bg-white focus:border-black"
               />
             </div>
           </div>
@@ -358,23 +358,23 @@ export default function CreateListingPage() {
         {/* Description & Image */}
         <div className="space-y-3">
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">Description</label>
+            <label className="block text-xs font-bold text-black mb-1">Description</label>
             <textarea
               rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Freshly prepared in our commercial kitchen today. Stored in temperature-controlled display."
-              className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-sm font-medium text-black focus:outline-none focus:bg-white focus:border-black"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">Image URL</label>
+            <label className="block text-xs font-bold text-black mb-1">Image URL</label>
             <input
               type="url"
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-sm font-medium text-black focus:outline-none focus:bg-white focus:border-black"
             />
           </div>
         </div>
@@ -382,9 +382,9 @@ export default function CreateListingPage() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          className="w-full py-4 bg-black hover:bg-neutral-800 text-white rounded-full font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50"
         >
-          {isLoading ? 'Publishing Surplus Food...' : <>Publish Food Listing <ArrowRight className="w-4 h-4" /></>}
+          {isLoading ? 'Publishing...' : <>Publish Food Listing <ArrowRight className="w-4 h-4" /></>}
         </button>
 
       </form>

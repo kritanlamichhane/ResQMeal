@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { FoodListing } from '@/types';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { X, CheckCircle2, AlertTriangle, ShieldCheck, QrCode } from 'lucide-react';
+import { X, CheckCircle2, AlertTriangle, ShieldCheck, Clock, ArrowRight } from 'lucide-react';
 
 interface ReservationModalProps {
   listing: FoodListing | null;
@@ -27,7 +27,7 @@ export function ReservationModal({ listing, onClose, onSuccess }: ReservationMod
 
   const handleReserve = async () => {
     if (!user) {
-      setError('Please sign in or use demo login to reserve meals.');
+      setError('Please sign in or use 1-click demo access to reserve meals.');
       return;
     }
     setIsLoading(true);
@@ -38,20 +38,20 @@ export function ReservationModal({ listing, onClose, onSuccess }: ReservationMod
       setSuccessData(res);
       onSuccess();
     } catch (err: any) {
-      setError(err.message || 'Unable to reserve food. The item might have just been booked.');
+      setError(err.message || 'Unable to reserve food. Inventory may have just been claimed.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative border border-gray-100 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative border border-neutral-200 overflow-hidden">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+          className="absolute top-5 right-5 p-2 text-neutral-400 hover:text-black rounded-full hover:bg-neutral-100 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -59,110 +59,109 @@ export function ReservationModal({ listing, onClose, onSuccess }: ReservationMod
         {!successData ? (
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-neutral-100 text-neutral-800">
                 {listing.category}
               </span>
-              <span className="text-xs text-gray-500">
-                Max {maxQty} portions available
+              <span className="text-xs text-neutral-500 font-medium">
+                {maxQty} portions in stock
               </span>
             </div>
 
-            <h2 className="text-xl font-extrabold text-gray-900 mb-1">
+            <h2 className="text-2xl font-black text-black tracking-tight mb-1">
               {listing.title}
             </h2>
-            <p className="text-xs text-gray-500 mb-4">
-              From {listing.provider?.business_name || 'Partner Kitchen'}
+            <p className="text-xs text-neutral-500 font-medium mb-5">
+              Sold by {listing.provider?.business_name || 'Verified Merchant'}
             </p>
 
-            {/* Price & Quantity Controls */}
-            <div className="bg-gray-50 rounded-2xl p-4 mb-4 border border-gray-100">
+            {/* Price & Quantity Controls (Uber Style) */}
+            <div className="bg-neutral-50 rounded-2xl p-4 mb-4 border border-neutral-200">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-sm font-medium text-gray-600">Select Portions</span>
+                <span className="text-sm font-bold text-neutral-800">Select Portions</span>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     disabled={quantity <= 1}
-                    className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center font-bold text-gray-700 disabled:opacity-40 hover:bg-gray-50"
+                    className="w-8 h-8 rounded-full bg-white border border-neutral-300 flex items-center justify-center font-bold text-black disabled:opacity-30 hover:bg-neutral-100 transition-colors"
                   >
                     -
                   </button>
-                  <span className="w-6 text-center font-black text-gray-900">{quantity}</span>
+                  <span className="w-6 text-center font-black text-black text-base">{quantity}</span>
                   <button
                     onClick={() => setQuantity(Math.min(maxQty, quantity + 1))}
                     disabled={quantity >= maxQty}
-                    className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center font-bold text-gray-700 disabled:opacity-40 hover:bg-gray-50"
+                    className="w-8 h-8 rounded-full bg-white border border-neutral-300 flex items-center justify-center font-bold text-black disabled:opacity-30 hover:bg-neutral-100 transition-colors"
                   >
                     +
                   </button>
                 </div>
               </div>
 
-              <div className="flex justify-between items-center pt-2 border-t border-gray-200 text-sm">
-                <span className="text-gray-600 font-medium">Total Amount</span>
-                <span className="text-xl font-black text-emerald-700">
+              <div className="flex justify-between items-center pt-3 border-t border-neutral-200">
+                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Subtotal</span>
+                <span className="text-2xl font-black text-black tracking-tight">
                   {listing.surplus_price === 0 ? 'FREE' : `₹${totalPrice}`}
                 </span>
               </div>
             </div>
 
-            {/* Food Safety & Pickup Notice */}
-            <div className="bg-emerald-50/70 rounded-xl p-3 mb-4 border border-emerald-100 flex items-start gap-2.5">
-              <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-emerald-900 leading-relaxed">
-                Pickup within the scheduled window. You will receive an instant verification code to show the provider.
-              </p>
+            {/* Food Safety Compliance Tag */}
+            <div className="bg-neutral-100 rounded-xl p-3 mb-5 flex items-start gap-2.5 text-xs text-neutral-700">
+              <ShieldCheck className="w-4 h-4 text-[#06C167] flex-shrink-0 mt-0.5" />
+              <span>Prepared fresh today in a certified commercial kitchen. FSSAI food safety compliant.</span>
             </div>
 
             {error && (
-              <div className="bg-rose-50 text-rose-700 p-3 rounded-xl text-xs mb-4 flex items-center gap-2 border border-rose-200">
-                <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+              <div className="bg-rose-50 text-rose-800 p-3 rounded-xl text-xs mb-4 flex items-center gap-2 border border-rose-200 font-medium">
+                <AlertTriangle className="w-4 h-4 flex-shrink-0 text-rose-600" />
                 <span>{error}</span>
               </div>
             )}
 
+            {/* Uber Primary Action Pill */}
             <button
               onClick={handleReserve}
               disabled={isLoading || maxQty === 0}
-              className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-4 px-6 bg-black hover:bg-neutral-800 text-white rounded-full font-extrabold text-sm transition-all duration-150 disabled:opacity-40 flex items-center justify-center gap-2 active:scale-98 shadow-md"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
-                <>Lock & Confirm Reservation</>
+                <>Confirm Reservation • {listing.surplus_price === 0 ? 'FREE' : `₹${totalPrice}`}</>
               )}
             </button>
           </div>
         ) : (
-          /* Confirmation Screen with Voucher */
-          <div className="text-center py-2">
-            <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
+          /* Confirmation Screen */
+          <div className="text-center py-4">
+            <div className="w-14 h-14 bg-[#E8F8EE] text-[#06C167] rounded-full flex items-center justify-center mx-auto mb-3">
               <CheckCircle2 className="w-8 h-8" />
             </div>
 
-            <h3 className="text-xl font-extrabold text-gray-900 mb-1">
-              Reservation Locked! 🎉
+            <h3 className="text-2xl font-black text-black tracking-tight mb-1">
+              Pickup Confirmed
             </h3>
-            <p className="text-xs text-gray-600 mb-4">
-              Your surplus food has been atomically reserved.
+            <p className="text-xs text-neutral-500 font-medium mb-6">
+              Your surplus order is securely held via atomic locking.
             </p>
 
-            <div className="bg-gray-50 border-2 border-dashed border-emerald-400 rounded-2xl p-5 mb-5">
-              <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block mb-1">
-                Digital Pickup Voucher Code
+            <div className="bg-neutral-50 border-2 border-dashed border-neutral-300 rounded-2xl p-5 mb-6">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1">
+                Storefront Pickup Code
               </span>
-              <div className="text-2xl font-mono font-black text-emerald-700 tracking-wider">
+              <div className="text-3xl font-mono font-black text-black tracking-widest">
                 {successData.pickup_code}
               </div>
-              <p className="text-[11px] text-gray-400 mt-1">
-                Show this code at the store counter upon arrival.
+              <p className="text-[11px] text-neutral-500 mt-1 font-medium">
+                Show this voucher code at the counter during your pickup window.
               </p>
             </div>
 
             <button
               onClick={onClose}
-              className="w-full py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold text-sm transition-colors"
+              className="w-full py-3.5 bg-black hover:bg-neutral-800 text-white rounded-full font-bold text-sm transition-all"
             >
-              View in My Pickups
+              View in My Orders
             </button>
           </div>
         )}

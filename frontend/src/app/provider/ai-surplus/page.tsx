@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { api } from '@/lib/api';
 import { SurplusPredictionResult } from '@/types';
-import { TrendingUp, Sparkles, BrainCircuit, AlertTriangle, CheckCircle, BarChart3, CloudRain } from 'lucide-react';
+import { TrendingUp, BrainCircuit, AlertTriangle, CheckCircle, BarChart3, CloudRain } from 'lucide-react';
 
 export default function AISurplusPage() {
   const [category, setCategory] = useState('BAKERY');
@@ -44,9 +44,9 @@ export default function AISurplusPage() {
   const getRiskBadge = (level: string) => {
     switch (level) {
       case 'LOW':
-        return <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full font-bold text-xs">Low Waste Risk</span>;
+        return <span className="px-3 py-1 bg-[#E8F8EE] text-[#05944F] rounded-full font-bold text-xs">Low Waste Risk</span>;
       case 'MEDIUM':
-        return <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full font-bold text-xs">Moderate Waste Risk</span>;
+        return <span className="px-3 py-1 bg-amber-100 text-amber-900 rounded-full font-bold text-xs">Moderate Risk</span>;
       case 'HIGH':
         return <span className="px-3 py-1 bg-rose-100 text-rose-800 rounded-full font-bold text-xs">High Waste Risk</span>;
       default:
@@ -55,39 +55,39 @@ export default function AISurplusPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
       
       <div className="mb-8">
-        <span className="text-emerald-600 font-extrabold text-xs uppercase tracking-wider">
-          AI/ML Feature #1 — Scikit-Learn Regression
+        <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest">
+          Machine Learning • Scikit-Learn Random Forest
         </span>
-        <h1 className="text-3xl font-black text-gray-900">
+        <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight mt-0.5">
           Surplus Quantity Predictor
         </h1>
-        <p className="text-xs text-gray-500 mt-1">
-          Trained on real culinary operational factors (footfall patterns, rainy weather variance, day of week) to forecast evening surplus before it happens.
+        <p className="text-xs text-neutral-500 font-medium mt-1">
+          Predict end-of-day surplus before it happens by factoring kitchen production, rainy weather footfall reduction, and day-of-week demand variance.
         </p>
       </div>
 
       {error && (
-        <div className="p-3 mb-6 bg-red-50 text-red-700 rounded-2xl text-xs font-bold border border-red-200">
+        <div className="p-3 mb-6 bg-rose-50 text-rose-800 rounded-2xl text-xs font-bold border border-rose-200">
           {error}
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         
-        {/* Form Inputs */}
-        <div className="md:col-span-2 bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-md">
+        {/* Form Inputs (Uber Card Style) */}
+        <div className="md:col-span-2 bg-white rounded-3xl p-6 sm:p-8 border border-neutral-200 shadow-sm">
           <form onSubmit={handlePredict} className="space-y-4">
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Food Category</label>
+                <label className="block text-xs font-bold text-black mb-1.5">Food Category</label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3.5 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-xs font-bold text-black focus:outline-none focus:bg-white focus:border-black"
                 >
                   <option value="BAKERY">Bakery & Pastries</option>
                   <option value="MEALS">Cooked Meals / Thalis</option>
@@ -98,27 +98,27 @@ export default function AISurplusPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Weather Condition</label>
+                <label className="block text-xs font-bold text-black mb-1.5">Weather Condition</label>
                 <select
                   value={weatherCondition}
                   onChange={(e) => setWeatherCondition(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3.5 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-xs font-bold text-black focus:outline-none focus:bg-white focus:border-black"
                 >
                   <option value="Clear">Clear / Sunny</option>
-                  <option value="Rain">Rainy (Reduced Walk-in Footfall)</option>
+                  <option value="Rain">Rainy (Reduced Walk-ins)</option>
                   <option value="Cloudy">Cloudy / Overcast</option>
-                  <option value="Storm">Storm / Thunderstorm</option>
+                  <option value="Storm">Storm / Heavy Rain</option>
                 </select>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Day of Week</label>
+                <label className="block text-xs font-bold text-black mb-1.5">Day of Week</label>
                 <select
                   value={dayOfWeek}
                   onChange={(e) => setDayOfWeek(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-xs font-bold text-black focus:outline-none focus:bg-white focus:border-black"
                 >
                   <option value={0}>Monday</option>
                   <option value={1}>Tuesday</option>
@@ -131,26 +131,26 @@ export default function AISurplusPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Produced Today</label>
+                <label className="block text-xs font-bold text-black mb-1.5">Produced</label>
                 <input
                   type="number"
                   min="5"
                   required
                   value={quantityProduced}
                   onChange={(e) => setQuantityProduced(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2.5 rounded-xl bg-neutral-100 border border-neutral-200 text-sm font-semibold text-black focus:outline-none focus:bg-white focus:border-black"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Price / Portion</label>
+                <label className="block text-xs font-bold text-black mb-1.5">Price (₹)</label>
                 <input
                   type="number"
                   min="10"
                   required
                   value={originalPrice}
                   onChange={(e) => setOriginalPrice(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2.5 rounded-xl bg-neutral-100 border border-neutral-200 text-sm font-semibold text-black focus:outline-none focus:bg-white focus:border-black"
                 />
               </div>
             </div>
@@ -161,76 +161,76 @@ export default function AISurplusPage() {
                 id="holidayCheck"
                 checked={isHoliday}
                 onChange={(e) => setIsHoliday(e.target.checked)}
-                className="w-4 h-4 accent-emerald-600 rounded"
+                className="w-4 h-4 accent-black rounded"
               />
-              <label htmlFor="holidayCheck" className="text-xs font-bold text-gray-700 cursor-pointer">
-                Public Holiday or Festival Day
+              <label htmlFor="holidayCheck" className="text-xs font-bold text-black cursor-pointer">
+                Public Holiday / Festival Footfall Shift
               </label>
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3.5 bg-black hover:bg-neutral-800 text-white rounded-full font-black text-sm shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
             >
-              {isLoading ? 'Running ML Regressor...' : <><BrainCircuit className="w-4 h-4" /> Forecast Surplus</>}
+              {isLoading ? 'Running ML Regressor...' : <><BrainCircuit className="w-4 h-4 text-[#06C167]" /> Forecast Surplus</>}
             </button>
 
           </form>
         </div>
 
-        {/* Prediction Results & Model Evaluation Box */}
+        {/* Results & Transparent Metrics Box */}
         <div className="space-y-6">
           {prediction ? (
-            <div className="bg-white rounded-3xl p-6 border border-emerald-200 shadow-xl space-y-4 animate-in fade-in">
+            <div className="bg-white rounded-3xl p-6 border border-neutral-200 shadow-sm space-y-4 animate-in fade-in">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                  ML Prediction Output
+                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+                  Model Output
                 </span>
                 {getRiskBadge(prediction.waste_risk_level)}
               </div>
 
               <div>
-                <div className="text-3xl font-black text-gray-900">
+                <div className="text-3xl font-black text-black tracking-tight">
                   {prediction.predicted_surplus_quantity} portions
                 </div>
-                <div className="text-xs text-gray-500 font-medium mt-0.5">
-                  Expected interval: <strong>{prediction.confidence_interval[0]} - {prediction.confidence_interval[1]} portions</strong>
+                <div className="text-xs text-neutral-500 font-medium mt-0.5">
+                  Expected interval: <strong className="text-black">{prediction.confidence_interval[0]} - {prediction.confidence_interval[1]} portions</strong>
                 </div>
               </div>
 
-              <div className="p-3.5 bg-emerald-50 text-emerald-950 rounded-2xl text-xs leading-relaxed border border-emerald-100">
+              <div className="p-4 bg-neutral-50 text-neutral-800 rounded-2xl text-xs leading-relaxed border border-neutral-200 font-medium">
                 {prediction.explanation}
               </div>
 
               {/* Transparent Evaluation Metrics */}
-              <div className="pt-3 border-t border-gray-100">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">
+              <div className="pt-3 border-t border-neutral-200">
+                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest block mb-2.5">
                   Transparent Evaluation Metrics
                 </span>
                 <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="p-2 bg-gray-50 rounded-xl">
-                    <div className="text-xs font-black text-gray-800">{prediction.metrics.mae}</div>
-                    <div className="text-[9px] text-gray-400 font-bold uppercase">MAE</div>
+                  <div className="p-2.5 bg-neutral-50 rounded-xl border border-neutral-200">
+                    <div className="text-xs font-black text-black">{prediction.metrics.mae}</div>
+                    <div className="text-[9px] text-neutral-400 font-bold uppercase">MAE</div>
                   </div>
-                  <div className="p-2 bg-gray-50 rounded-xl">
-                    <div className="text-xs font-black text-gray-800">{prediction.metrics.rmse}</div>
-                    <div className="text-[9px] text-gray-400 font-bold uppercase">RMSE</div>
+                  <div className="p-2.5 bg-neutral-50 rounded-xl border border-neutral-200">
+                    <div className="text-xs font-black text-black">{prediction.metrics.rmse}</div>
+                    <div className="text-[9px] text-neutral-400 font-bold uppercase">RMSE</div>
                   </div>
-                  <div className="p-2 bg-gray-50 rounded-xl">
-                    <div className="text-xs font-black text-emerald-700">{prediction.metrics.r2}</div>
-                    <div className="text-[9px] text-gray-400 font-bold uppercase">R² Score</div>
+                  <div className="p-2.5 bg-neutral-50 rounded-xl border border-neutral-200">
+                    <div className="text-xs font-black text-[#05944F]">{prediction.metrics.r2}</div>
+                    <div className="text-[9px] text-neutral-400 font-bold uppercase">R² Score</div>
                   </div>
                 </div>
               </div>
 
             </div>
           ) : (
-            <div className="bg-gray-50 rounded-3xl p-6 border border-gray-200 text-center text-gray-400">
-              <BrainCircuit className="w-10 h-10 mx-auto mb-2 text-gray-300" />
-              <h3 className="text-sm font-bold text-gray-700 mb-1">Awaiting Parameters</h3>
-              <p className="text-xs text-gray-500">
-                Configure your daily production parameters and click Forecast Surplus to evaluate expected leftovers.
+            <div className="bg-neutral-50 rounded-3xl p-6 border border-neutral-200 text-center text-neutral-400">
+              <BrainCircuit className="w-10 h-10 mx-auto mb-2 text-neutral-400" />
+              <h3 className="text-sm font-bold text-black mb-1">Awaiting Prediction</h3>
+              <p className="text-xs text-neutral-500 font-medium">
+                Configure your daily batch parameters and click Forecast Surplus to predict leftover food.
               </p>
             </div>
           )}

@@ -5,15 +5,15 @@ import { api } from '@/lib/api';
 import { FoodListing, FoodCategory } from '@/types';
 import { FoodCard } from '@/components/FoodCard';
 import { ReservationModal } from '@/components/ReservationModal';
-import { Search, MapPin, SlidersHorizontal, Sparkles, Filter, Leaf } from 'lucide-react';
+import { Search, MapPin, SlidersHorizontal, Leaf, X } from 'lucide-react';
 
 const CATEGORIES: { label: string; value?: FoodCategory }[] = [
   { label: 'All Items' },
   { label: 'Warm Meals', value: 'MEALS' },
   { label: 'Bakery & Bread', value: 'BAKERY' },
   { label: 'Fresh Produce', value: 'PRODUCE' },
-  { label: 'Grocery', value: 'GROCERY' },
-  { label: 'Snacks & Bites', value: 'SNACKS' },
+  { label: 'Groceries', value: 'GROCERY' },
+  { label: 'Snacks & Quick Bites', value: 'SNACKS' },
 ];
 
 export default function ConsumerDashboard() {
@@ -27,7 +27,6 @@ export default function ConsumerDashboard() {
   const [radiusKm, setRadiusKm] = useState(10);
   const [vegOnly, setVegOnly] = useState(false);
 
-  // Coordinates: Default to Bangalore central coords
   const userLat = 12.9716;
   const userLng = 77.5946;
 
@@ -62,47 +61,30 @@ export default function ConsumerDashboard() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans">
       
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl mb-8 relative overflow-hidden">
-        <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold mb-3">
-            <Sparkles className="w-3.5 h-3.5" /> PostGIS & Haversine Proximity Search
-          </div>
-          <h1 className="text-2xl sm:text-4xl font-black tracking-tight">
-            Surplus Meals Near You
-          </h1>
-          <p className="mt-2 text-sm text-emerald-100">
-            Fresh, safe surplus prepared by local restaurants and bakeries. Up to 70% off.
-          </p>
-        </div>
-      </div>
-
-      {/* Filter & Search Bar */}
-      <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-md mb-8">
-        
-        <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center mb-6">
+      {/* Top Uber Eats Style Search & Filter Bar */}
+      <div className="mb-8">
+        <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
           
-          {/* Keyword Search */}
+          {/* Main Search Input */}
           <form onSubmit={handleSearchSubmit} className="relative flex-1">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
+            <Search className="w-5 h-5 text-black absolute left-4 top-3.5" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by meal name, bakery, biryani, or restaurant..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              placeholder="Search surplus meals, bakery, or restaurants..."
+              className="w-full pl-12 pr-4 py-3 rounded-full bg-neutral-100 hover:bg-neutral-200/80 focus:bg-white text-sm font-semibold text-black placeholder-neutral-500 border border-transparent focus:border-black focus:outline-none transition-all"
             />
           </form>
 
-          {/* Distance Slider */}
-          <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-200">
-            <MapPin className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-            <div className="flex flex-col">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
-                Radius: <strong className="text-emerald-700">{radiusKm} km</strong>
-              </span>
+          <div className="flex items-center gap-3 overflow-x-auto pb-1">
+            
+            {/* Radius Filter Pill */}
+            <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-neutral-100 border border-neutral-200 text-xs font-bold text-black flex-shrink-0">
+              <MapPin className="w-4 h-4 text-black" />
+              <span>Radius: <strong className="text-black">{radiusKm} km</strong></span>
               <input
                 type="range"
                 min="1"
@@ -110,38 +92,40 @@ export default function ConsumerDashboard() {
                 step="1"
                 value={radiusKm}
                 onChange={(e) => setRadiusKm(Number(e.target.value))}
-                className="w-32 accent-emerald-600 cursor-pointer h-1.5 bg-gray-200 rounded-lg"
+                className="w-24 accent-black cursor-pointer h-1.5 bg-neutral-300 rounded-lg ml-1"
               />
             </div>
-          </div>
 
-          {/* Veg Only Toggle */}
-          <button
-            type="button"
-            onClick={() => setVegOnly(!vegOnly)}
-            className={`px-4 py-2.5 rounded-2xl text-xs font-bold border transition-all flex items-center gap-1.5 ${
-              vegOnly 
-                ? 'bg-green-100 text-green-800 border-green-300 shadow-sm' 
-                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-            }`}
-          >
-            <Leaf className="w-4 h-4 text-green-600" /> Veg Only
-          </button>
+            {/* Pure Veg Pill */}
+            <button
+              type="button"
+              onClick={() => setVegOnly(!vegOnly)}
+              className={`px-4 py-2.5 rounded-full text-xs font-bold border transition-all flex items-center gap-1.5 flex-shrink-0 ${
+                vegOnly 
+                  ? 'bg-black text-white border-black shadow-sm' 
+                  : 'bg-neutral-100 text-neutral-800 border-neutral-200 hover:bg-neutral-200'
+              }`}
+            >
+              <Leaf className={`w-3.5 h-3.5 ${vegOnly ? 'text-[#06C167]' : 'text-green-700'}`} />
+              Pure Veg
+            </button>
+
+          </div>
 
         </div>
 
-        {/* Category Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+        {/* Uber Eats Category Pills */}
+        <div className="flex items-center gap-2 mt-4 overflow-x-auto pb-2 no-scrollbar">
           {CATEGORIES.map((cat, idx) => {
             const isSelected = selectedCategory === cat.value;
             return (
               <button
                 key={idx}
                 onClick={() => setSelectedCategory(cat.value)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
                   isSelected
-                    ? 'bg-emerald-600 text-white shadow-md'
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    ? 'bg-black text-white shadow-sm'
+                    : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-800'
                 }`}
               >
                 {cat.label}
@@ -149,18 +133,27 @@ export default function ConsumerDashboard() {
             );
           })}
         </div>
-
       </div>
 
-      {/* Listings Grid */}
+      {/* Active Results Summary */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl sm:text-2xl font-black text-black tracking-tight">
+          Nearby Deals in Bangalore
+        </h2>
+        <span className="text-xs font-semibold text-neutral-500">
+          {listings.length} items found
+        </span>
+      </div>
+
+      {/* Listings Grid (Uber Eats Cards) */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[1, 2, 3].map((n) => (
-            <div key={n} className="h-80 rounded-2xl bg-gray-100 animate-pulse" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((n) => (
+            <div key={n} className="h-80 rounded-2xl bg-neutral-100 animate-pulse" />
           ))}
         </div>
       ) : listings.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {listings.map((listing) => (
             <FoodCard
               key={listing.id}
@@ -170,19 +163,19 @@ export default function ConsumerDashboard() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-16 bg-white rounded-3xl border border-gray-100 p-8">
-          <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
-            <Search className="w-8 h-8" />
+        <div className="text-center py-20 bg-neutral-50 rounded-3xl border border-neutral-200 p-8">
+          <div className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center mx-auto mb-4 border border-neutral-200 shadow-sm">
+            <Search className="w-6 h-6" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-1">No surplus meals in this radius</h3>
-          <p className="text-xs text-gray-500 max-w-sm mx-auto mb-4">
-            Try expanding the search radius slider or changing category filters to discover more food.
+          <h3 className="text-lg font-black text-black mb-1">No surplus meals found</h3>
+          <p className="text-xs text-neutral-500 max-w-sm mx-auto mb-5 font-medium">
+            Try expanding your search radius slider or changing category filters.
           </p>
           <button
-            onClick={() => { setRadiusKm(20); setSelectedCategory(undefined); setVegOnly(false); setSearch(''); }}
-            className="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl"
+            onClick={() => { setRadiusKm(25); setSelectedCategory(undefined); setVegOnly(false); setSearch(''); }}
+            className="px-6 py-2.5 bg-black text-white hover:bg-neutral-800 text-xs font-bold rounded-full transition-all"
           >
-            Reset Filters (20km Radius)
+            Reset Filters (25 km Radius)
           </button>
         </div>
       )}

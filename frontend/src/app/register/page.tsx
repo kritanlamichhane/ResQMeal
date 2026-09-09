@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { UserRole } from '@/types';
-import { UtensilsCrossed, User, Store, HeartHandshake, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Utensils, User, Store, HeartHandshake, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -66,26 +66,26 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-gray-50/50">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-white font-sans">
       <div className="max-w-lg w-full">
         
-        <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
+        <div className="bg-white p-8 sm:p-10 rounded-3xl border border-neutral-200 shadow-xl">
           
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mx-auto mb-3 shadow-md">
-              <UtensilsCrossed className="w-6 h-6" />
+          <div className="mb-6">
+            <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center mb-4">
+              <Utensils className="w-5 h-5 stroke-[2.5]" />
             </div>
-            <h1 className="text-2xl font-black text-gray-900">Create ResQMeal Account</h1>
-            <p className="text-xs text-gray-500 mt-1">Join the food surplus reduction movement</p>
+            <h1 className="text-3xl font-black text-black tracking-tight">Create your account</h1>
+            <p className="text-xs text-neutral-500 font-medium mt-1">Select your account type to get started</p>
           </div>
 
-          {/* Role Tabs */}
-          <div className="grid grid-cols-3 gap-2 p-1.5 bg-gray-100 rounded-2xl mb-6">
+          {/* Uber Style Role Selector */}
+          <div className="grid grid-cols-3 gap-2 p-1.5 bg-neutral-100 rounded-full mb-6">
             <button
               type="button"
               onClick={() => setRole('CONSUMER')}
-              className={`py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                role === 'CONSUMER' ? 'bg-white text-emerald-700 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+              className={`py-2 rounded-full text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                role === 'CONSUMER' ? 'bg-black text-white shadow-sm' : 'text-neutral-600 hover:text-black'
               }`}
             >
               <User className="w-3.5 h-3.5" /> Consumer
@@ -93,92 +93,92 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setRole('PROVIDER')}
-              className={`py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                role === 'PROVIDER' ? 'bg-white text-emerald-700 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+              className={`py-2 rounded-full text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                role === 'PROVIDER' ? 'bg-black text-white shadow-sm' : 'text-neutral-600 hover:text-black'
               }`}
             >
-              <Store className="w-3.5 h-3.5" /> Food Provider
+              <Store className="w-3.5 h-3.5" /> Kitchen
             </button>
             <button
               type="button"
               onClick={() => setRole('NGO')}
-              className={`py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                role === 'NGO' ? 'bg-white text-emerald-700 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+              className={`py-2 rounded-full text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                role === 'NGO' ? 'bg-black text-white shadow-sm' : 'text-neutral-600 hover:text-black'
               }`}
             >
-              <HeartHandshake className="w-3.5 h-3.5" /> NGO Shelter
+              <HeartHandshake className="w-3.5 h-3.5 text-[#06C167]" /> Relief NGO
             </button>
           </div>
 
           {error && (
-            <div className="p-3 mb-4 rounded-xl bg-red-50 text-red-700 text-xs font-medium border border-red-200">
+            <div className="p-3 mb-5 rounded-xl bg-rose-50 text-rose-800 text-xs font-semibold border border-rose-200">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleRegister} className="space-y-3.5">
+          <form onSubmit={handleRegister} className="space-y-4">
             
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Full Name</label>
+              <label className="block text-xs font-bold text-black mb-1.5">Full legal name</label>
               <input
                 type="text"
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Aarav Sharma"
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-sm font-semibold text-black placeholder-neutral-400 focus:outline-none focus:bg-white focus:border-black transition-all"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Email</label>
+                <label className="block text-xs font-bold text-black mb-1.5">Email address</label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-sm font-semibold text-black placeholder-neutral-400 focus:outline-none focus:bg-white focus:border-black transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Password</label>
+                <label className="block text-xs font-bold text-black mb-1.5">Password</label>
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="At least 6 chars"
-                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  placeholder="At least 6 characters"
+                  className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-sm font-semibold text-black placeholder-neutral-400 focus:outline-none focus:bg-white focus:border-black transition-all"
                 />
               </div>
             </div>
 
-            {/* Provider Conditional Fields */}
+            {/* Provider Fields */}
             {role === 'PROVIDER' && (
-              <div className="pt-2 border-t border-gray-100 space-y-3">
-                <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block">
-                  Business Details & Food Safety
+              <div className="pt-2 border-t border-neutral-200 space-y-3">
+                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest block">
+                  Merchant & Safety Credentials
                 </span>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Business Name</label>
+                  <label className="block text-xs font-bold text-black mb-1">Business Name</label>
                   <input
                     type="text"
                     required
                     value={businessName}
                     onChange={(e) => setBusinessName(e.target.value)}
                     placeholder="e.g. Bella Italia Bakery"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-sm font-semibold text-black focus:outline-none focus:bg-white focus:border-black"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1">Business Type</label>
+                    <label className="block text-xs font-bold text-black mb-1">Business Type</label>
                     <select
                       value={businessType}
                       onChange={(e) => setBusinessType(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-3 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-xs font-bold text-black focus:outline-none focus:bg-white focus:border-black"
                     >
                       <option value="Restaurant">Restaurant</option>
                       <option value="Bakery">Bakery & Cafe</option>
@@ -187,78 +187,67 @@ export default function RegisterPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1">FSSAI / Food License</label>
+                    <label className="block text-xs font-bold text-black mb-1">FSSAI License #</label>
                     <input
                       type="text"
                       value={fssaiLicense}
                       onChange={(e) => setFssaiLicense(e.target.value)}
                       placeholder="FSSAI-123456"
-                      className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-sm font-semibold text-black focus:outline-none focus:bg-white focus:border-black"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Store Address</label>
+                  <label className="block text-xs font-bold text-black mb-1">Kitchen Address</label>
                   <input
                     type="text"
                     required
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     placeholder="Indiranagar, Bangalore"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-sm font-semibold text-black focus:outline-none focus:bg-white focus:border-black"
                   />
                 </div>
               </div>
             )}
 
-            {/* NGO Conditional Fields */}
+            {/* NGO Fields */}
             {role === 'NGO' && (
-              <div className="pt-2 border-t border-gray-100 space-y-3">
-                <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wider block">
-                  NGO Organization Profile
+              <div className="pt-2 border-t border-neutral-200 space-y-3">
+                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest block">
+                  Organization Verification
                 </span>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Organization Name</label>
+                  <label className="block text-xs font-bold text-black mb-1">Organization Name</label>
                   <input
                     type="text"
                     required
                     value={orgName}
                     onChange={(e) => setOrgName(e.target.value)}
-                    placeholder="e.g. Robin Hood Army Bangalore"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    placeholder="e.g. Robin Hood Army"
+                    className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-sm font-semibold text-black focus:outline-none focus:bg-white focus:border-black"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1">Reg Number</label>
+                    <label className="block text-xs font-bold text-black mb-1">Reg Number</label>
                     <input
                       type="text"
                       value={registrationNumber}
                       onChange={(e) => setRegistrationNumber(e.target.value)}
                       placeholder="NGO-REG-2025"
-                      className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-sm font-semibold text-black focus:outline-none focus:bg-white focus:border-black"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1">Daily Meal Capacity</label>
+                    <label className="block text-xs font-bold text-black mb-1">Daily Meal Capacity</label>
                     <input
                       type="number"
                       value={dailyCapacity}
                       onChange={(e) => setDailyCapacity(Number(e.target.value))}
-                      className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-4 py-3 rounded-xl bg-neutral-100 border border-neutral-200 text-sm font-semibold text-black focus:outline-none focus:bg-white focus:border-black"
                     />
                   </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Shelter / Depot Address</label>
-                  <input
-                    type="text"
-                    required
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Koramangala, Bangalore"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  />
                 </div>
               </div>
             )}
@@ -266,17 +255,17 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 mt-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-4 bg-black hover:bg-neutral-800 text-white rounded-full font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-4 shadow-md"
             >
-              {isLoading ? 'Creating account...' : <>Complete Registration <ArrowRight className="w-4 h-4" /></>}
+              {isLoading ? 'Creating account...' : <>Create Account <ArrowRight className="w-4 h-4" /></>}
             </button>
 
           </form>
 
-          <p className="mt-5 text-center text-xs text-gray-500">
+          <p className="mt-8 text-center text-xs text-neutral-500 font-medium">
             Already have an account?{' '}
-            <Link href="/login" className="font-bold text-emerald-600 hover:underline">
-              Sign In
+            <Link href="/login" className="font-bold text-black hover:underline">
+              Sign in
             </Link>
           </p>
 
