@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 from app.models.user import UserRole
@@ -20,11 +20,11 @@ class RefreshTokenRequest(BaseModel):
     refresh_token: str
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    email: str = Field(..., description="User email address")
     password: str
 
 class RegisterRequest(BaseModel):
-    email: EmailStr
+    email: str = Field(..., description="User email address")
     password: str = Field(..., min_length=6)
     full_name: str = Field(..., min_length=2)
     phone: Optional[str] = None
@@ -47,7 +47,7 @@ class RegisterRequest(BaseModel):
 
 class UserResponse(BaseModel):
     id: int
-    email: EmailStr
+    email: str
     full_name: str
     phone: Optional[str] = None
     role: UserRole
