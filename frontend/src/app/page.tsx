@@ -1,26 +1,74 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { FoodListing, PlatformMetrics } from '@/types';
 import { FoodCard } from '@/components/FoodCard';
 import { ReservationModal } from '@/components/ReservationModal';
 import { 
   ArrowRight, ShieldCheck, Zap, Utensils, 
-  Leaf, HeartHandshake, Store, TrendingUp, Lock, MapPin, Search
+  Leaf, HeartHandshake, Store, TrendingUp, Lock, MapPin, Search, ChevronDown, Check
 } from 'lucide-react';
+import { BANGALORE_NEIGHBORHOODS, NeighborhoodLocation, resolveNeighborhood } from '@/lib/neighborhoods';
 
 export default function HomePage() {
+  const router = useRouter();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   const [metrics, setMetrics] = useState<PlatformMetrics | null>(null);
   const [featuredListings, setFeaturedListings] = useState<FoodListing[]>([]);
   const [selectedListing, setSelectedListing] = useState<FoodListing | null>(null);
   const [activeTab, setActiveTab] = useState<'consumer' | 'provider' | 'ngo'>('consumer');
 
+  // Interactive Place Selection State
+  const [selectedLocation, setSelectedLocation] = useState('Bangalore Central');
+  const [selectedCoords, setSelectedCoords] = useState({ lat: 12.9716, lng: 77.5946 });
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const loadListingsForCoords = (lat: number, lng: number) => {
+    api.getNearbyListings(lat, lng, 15)
+      .then((items) => {
+        if (items && items.length > 0) {
+          setFeaturedListings(items.slice(0, 3));
+        } else {
+          api.getListings({ size: 3 }).then((d) => setFeaturedListings(d.items || []));
+        }
+      })
+      .catch(() => {
+        api.getListings({ size: 3 }).then((d) => setFeaturedListings(d.items || []));
+      });
+  };
+
   useEffect(() => {
     api.getPlatformMetrics().then(setMetrics).catch(() => {});
-    api.getListings({ size: 3 }).then((d) => setFeaturedListings(d.items || [])).catch(() => {});
+    loadListingsForCoords(selectedCoords.lat, selectedCoords.lng);
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleSelectPlace = (place: NeighborhoodLocation) => {
+    setSelectedLocation(place.name);
+    setSelectedCoords({ lat: place.lat, lng: place.lng });
+    setIsDropdownOpen(false);
+    loadListingsForCoords(place.lat, place.lng);
+  };
+
+  const handleLocationSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const matched = resolveNeighborhood(selectedLocation);
+
+    router.push(
+      `/consumer/dashboard?location=${encodeURIComponent(selectedLocation)}&lat=${matched.lat}&lng=${matched.lng}`
+    );
+  };
 
   return (
     <div className="flex flex-col min-h-screen font-sans bg-white text-black">
@@ -73,23 +121,100 @@ export default function HomePage() {
                     Discover freshly prepared meals, pastries, and produce from top restaurants and bakeries near you before closing time.
                   </p>
                   
-                  {/* Uber Style Search Bar */}
-                  <div className="flex flex-col sm:flex-row gap-3 max-w-xl mb-6">
-                    <div className="flex-1 flex items-center gap-3 px-4 py-3.5 bg-neutral-100 rounded-2xl border border-neutral-200">
-                      <MapPin className="w-5 h-5 text-black flex-shrink-0" />
-                      <input
-                        type="text"
-                        placeholder="Enter your neighborhood (e.g. Koramangala)"
-                        defaultValue="Bangalore Central"
-                        className="w-full bg-transparent text-sm font-semibold text-black placeholder-neutral-400 focus:outline-none"
-                      />
+                  {/* Uber Style Location Search Bar with Neighborhood Selection */}
+                  <div className="relative max-w-xl mb-6" ref={dropdownRef}>
+                    <form onSubmit={handleLocationSubmit} className="flex flex-col sm:flex-row gap-3">
+                      <div className="relative flex-1 flex items-center gap-3 px-4 py-3.5 bg-neutral-100 rounded-2xl border border-neutral-200 focus-within:border-black focus-within:bg-white transition-all">
+                        <MapPin className="w-5 h-5 text-black flex-shrink-0" />
+                        <input
+                          type="text"
+                          value={selectedLocation}
+                          onChange={(e) => {
+                            setSelectedLocation(e.target.value);
+                            setIsDropdownOpen(true);
+                          }}
+                          onFocus={() => setIsDropdownOpen(true)}
+                          placeholder="Select neighborhood (e.g. Koramangala)"
+                          className="w-full bg-transparent text-sm font-semibold text-black placeholder-neutral-400 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                          className="p-1 text-neutral-400 hover:text-black transition-colors"
+                          title="Select neighborhood"
+                        >
+                          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-black' : ''}`} />
+                        </button>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="px-7 py-3.5 bg-black hover:bg-neutral-800 text-white font-extrabold rounded-2xl text-sm transition-all flex items-center justify-center gap-2 shadow-md flex-shrink-0 active:scale-98"
+                      >
+                        Find Food <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </form>
+
+                    {/* Neighborhood Dropdown Menu */}
+                    {isDropdownOpen && (
+                      <div className="absolute top-full left-0 right-0 sm:right-36 mt-2 bg-white rounded-2xl border border-neutral-200 shadow-2xl z-40 overflow-hidden divide-y divide-neutral-100 animate-in fade-in slide-in-from-top-2 duration-150">
+                        <div className="px-4 py-2 bg-neutral-50 text-[10px] font-black uppercase tracking-wider text-neutral-400">
+                          Select Delivery / Pickup Zone
+                        </div>
+                        <div className="max-h-60 overflow-y-auto">
+                          {BANGALORE_NEIGHBORHOODS.map((place) => {
+                            const isSelected = selectedLocation.toLowerCase() === place.name.toLowerCase();
+                            return (
+                              <button
+                                key={place.id}
+                                type="button"
+                                onClick={() => handleSelectPlace(place)}
+                                className={`w-full px-4 py-3 flex items-center justify-between text-left hover:bg-neutral-50 transition-colors ${
+                                  isSelected ? 'bg-neutral-100' : ''
+                                }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 rounded-full bg-neutral-200 flex items-center justify-center text-black">
+                                    <MapPin className="w-4 h-4" />
+                                  </div>
+                                  <div>
+                                    <div className="text-xs font-bold text-black">{place.name}</div>
+                                    <div className="text-[11px] text-neutral-500 font-medium">{place.landmark}</div>
+                                  </div>
+                                </div>
+                                {isSelected && (
+                                  <Check className="w-4 h-4 text-[#06C167] stroke-[3]" />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Quick Select Neighborhood Chips */}
+                    <div className="flex flex-wrap items-center gap-2 mt-3.5">
+                      <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider mr-1">
+                        Popular:
+                      </span>
+                      {BANGALORE_NEIGHBORHOODS.slice(0, 4).map((place) => {
+                        const isSelected = selectedLocation.toLowerCase() === place.name.toLowerCase();
+                        return (
+                          <button
+                            key={place.id}
+                            type="button"
+                            onClick={() => handleSelectPlace(place)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+                              isSelected
+                                ? 'bg-black text-white shadow-sm'
+                                : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700'
+                            }`}
+                          >
+                            {place.label}
+                          </button>
+                        );
+                      })}
                     </div>
-                    <Link
-                      href="/consumer/dashboard"
-                      className="px-7 py-3.5 bg-black hover:bg-neutral-800 text-white font-extrabold rounded-2xl text-sm transition-all flex items-center justify-center gap-2 shadow-md flex-shrink-0"
-                    >
-                      Find Food <ArrowRight className="w-4 h-4" />
-                    </Link>
                   </div>
                 </div>
               )}
@@ -227,15 +352,15 @@ export default function HomePage() {
                 Available Right Now
               </span>
               <h2 className="text-3xl sm:text-4xl font-black text-black tracking-tight mt-1">
-                Surplus Near You
+                Surplus Near {selectedLocation}
               </h2>
             </div>
 
             <Link
-              href="/consumer/dashboard"
+              href={`/consumer/dashboard?location=${encodeURIComponent(selectedLocation)}&lat=${selectedCoords.lat}&lng=${selectedCoords.lng}`}
               className="hidden sm:inline-flex items-center gap-1 text-sm font-bold text-black hover:underline"
             >
-              See all nearby listings <ArrowRight className="w-4 h-4" />
+              See all {selectedLocation} listings <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
