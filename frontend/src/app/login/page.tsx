@@ -34,8 +34,8 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
     try {
-      await login(email, password);
-      router.push('/consumer/dashboard');
+      const profile = await login(email, password);
+      navigateAfterLogin(profile.role);
     } catch (err: any) {
       setError(err.message || 'Invalid email or password');
     } finally {

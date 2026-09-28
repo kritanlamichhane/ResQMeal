@@ -4,11 +4,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { UserRole } from '@/types';
 import { Utensils, User, Store, HeartHandshake, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { login } = useAuth();
   
   const [role, setRole] = useState<UserRole>('CONSUMER');
   const [fullName, setFullName] = useState('');
@@ -57,7 +59,17 @@ export default function RegisterPage() {
 
     try {
       await api.register(payload);
-      router.push('/login');
+      // Automatically log in the user immediately upon registration
+      await login(email, password);
+
+      // Seamlessly redirect to the appropriate dashboard
+      if (role === 'PROVIDER') {
+        router.push('/provider/dashboard');
+      } else if (role === 'NGO') {
+        router.push('/ngo/dashboard');
+      } else {
+        router.push('/consumer/dashboard');
+      }
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {

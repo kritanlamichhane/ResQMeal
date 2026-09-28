@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { FoodListing } from '@/types';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { X, CheckCircle2, AlertTriangle, ShieldCheck, Clock, ArrowRight } from 'lucide-react';
+import { X, CheckCircle2, AlertTriangle, ShieldCheck, Clock, ArrowRight, User } from 'lucide-react';
 
 interface ReservationModalProps {
   listing: FoodListing | null;
@@ -13,7 +14,7 @@ interface ReservationModalProps {
 }
 
 export function ReservationModal({ listing, onClose, onSuccess }: ReservationModalProps) {
-  const { user } = useAuth();
+  const { user, quickLoginAs } = useAuth();
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,14 +27,15 @@ export function ReservationModal({ listing, onClose, onSuccess }: ReservationMod
   const maxQty = listing.remaining_quantity;
 
   const handleReserve = async () => {
-    if (!user) {
-      setError('Please sign in or use 1-click demo access to reserve meals.');
-      return;
-    }
     setIsLoading(true);
     setError(null);
 
     try {
+      if (!user) {
+        // Automatically activate demo consumer session so guest can reserve immediately
+        await quickLoginAs('CONSUMER');
+      }
+
       const res = await api.reserveFood(listing.id, quantity);
       setSuccessData(res);
       onSuccess();
@@ -115,6 +117,28 @@ export function ReservationModal({ listing, onClose, onSuccess }: ReservationMod
               <div className="bg-rose-50 text-rose-800 p-3 rounded-xl text-xs mb-4 flex items-center gap-2 border border-rose-200 font-medium">
                 <AlertTriangle className="w-4 h-4 flex-shrink-0 text-rose-600" />
                 <span>{error}</span>
+              </div>
+            )}
+
+            {!user && (
+              <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-3.5 mb-4 text-xs">
+                <div className="flex items-center justify-between font-bold text-neutral-800 mb-1">
+                  <span className="flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-neutral-500" /> Reserving as Guest
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Link href="/login" className="text-black underline font-extrabold hover:text-neutral-700">
+                      Sign In
+                    </Link>
+                    <span className="text-neutral-300">•</span>
+                    <Link href="/register" className="text-black underline font-extrabold hover:text-neutral-700">
+                      Sign Up
+                    </Link>
+                  </div>
+                </div>
+                <p className="text-[11px] text-neutral-500 font-medium">
+                  Confirming will activate a session and reserve your instant pickup voucher.
+                </p>
               </div>
             )}
 
