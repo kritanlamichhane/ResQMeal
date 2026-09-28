@@ -120,18 +120,18 @@ ResQMeal includes an automated multi-threaded test (`backend/tests/test_concurre
 
 ---
 
-## 5. Architectural Roles of Redis
+## 5. In-Memory Caching & Rate Limiting (Zero-Redis Architecture)
 
-ResQMeal utilizes Redis for deliberate, high-value architectural functions:
+To ensure the project runs seamlessly out-of-the-box in local environments without requiring an external Redis daemon or Docker container, ResQMeal employs an **in-memory thread-safe caching and locking service**:
 
-1. **Nearby Listings Geospatial Caching**:
-   - Geospatial distance math is cached by coordinate grid and radius (TTL: 60s) to absorb repeat consumer searches during peak evening windows.
+1. **Nearby Listings Geospatial Cache**:
+   - Geospatial proximity calculations are cached by coordinate grid and radius (TTL: 60s) to absorb repeat consumer searches during peak evening windows.
 2. **Distributed Reservation Mutex Lock**:
-   - Uses `SET lock:reserve_listing_{id} NX EX 3` to coordinate listing locks under high-throughput request spikes and prevent database row thrashing.
+   - Simulates atomic mutex locking (`lock:reserve_listing_{id}`) to coordinate listing locks under high-throughput request spikes and prevent database row thrashing.
 3. **Sliding-Window Rate Limiting**:
    - Critical endpoints (`POST /api/v1/reservations`) enforce rate limiting (`30 req/min/IP`) to protect against bot scalping and denial-of-service attempts.
-4. **Resilient Local Zero-Docker Fallback**:
-   - If an external Redis daemon is not running locally, the system automatically falls back to a thread-safe in-memory cache with identical TTL, expiration, and mutex semantics, ensuring seamless local development without Docker.
+4. **Thread-Safe Concurrency**:
+   - Protected via Python `threading.Lock()` to maintain thread safety across concurrent requests.
 
 ---
 
@@ -289,11 +289,13 @@ python load_tests/concurrent_reservations_stress.py --url http://localhost:8000 
 
 In alignment with practical software engineering portfolio goals, certain heavyweight enterprise distributed components were intentionally streamlined:
 
-1. **Kafka Replaced with Asynchronous Event Workers**:
-   - Rather than requiring multi-node Apache Kafka and Zookeeper clusters locally, background task processing and reservation expiration are handled via native **FastAPI async worker loops and Redis pub/sub semantics**. In enterprise production, this can seamlessly transition to Kafka consumer groups.
-2. **Zero-Docker Database Resilience**:
-   - Supports production PostgreSQL + PostGIS, while embedding a resilient zero-setup database fallback with Haversine spherical math so evaluators can run the project immediately with `venv`.
-3. **Food Safety Disclaimers**:
+1. **Redis Substituted with Thread-Safe In-Memory Cache**:
+   - Rather than requiring a separate Redis daemon installation or container on the evaluator's system, caching, rate limiting, and mutex locking are handled in-memory within Python. In high-traffic distributed deployments across multiple servers, this layer can be switched directly to a multi-node Redis cluster.
+2. **Kafka Replaced with Asynchronous Event Workers**:
+   - Background reservation expiration and status updates are managed by native **FastAPI async background tasks**. In large enterprise architectures, this pattern scales into an Apache Kafka event bus.
+3. **Zero-Docker Database Resilience**:
+   - Supports production PostgreSQL + PostGIS, while embedding a resilient zero-setup SQLite database with Haversine spherical math so evaluators can run the project immediately with `venv`.
+4. **Food Safety Disclaimers**:
    - All food listings mandate preparation timestamps, best-before deadlines, and FSSAI commercial compliance fields. The platform enforces commercial provider accountability for food freshness.
 
 ---
