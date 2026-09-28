@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import update, case, select
+from sqlalchemy import update, case, select, cast
 from app.models.food_listing import FoodListing, ListingStatus
 from app.models.reservation import Reservation, ReservationStatus
 from app.models.provider import Provider
@@ -48,9 +48,12 @@ class ReservationService:
                 .where(FoodListing.status == ListingStatus.ACTIVE)
                 .values(
                     remaining_quantity=FoodListing.remaining_quantity - quantity,
-                    status=case(
-                        (FoodListing.remaining_quantity - quantity == 0, ListingStatus.SOLD_OUT),
-                        else_=ListingStatus.ACTIVE
+                    status=cast(
+                        case(
+                            (FoodListing.remaining_quantity - quantity == 0, ListingStatus.SOLD_OUT.value),
+                            else_=ListingStatus.ACTIVE.value
+                        ),
+                        FoodListing.status.type
                     )
                 )
             )
@@ -130,9 +133,12 @@ class ReservationService:
             .where(FoodListing.id == reservation.listing_id)
             .values(
                 remaining_quantity=FoodListing.remaining_quantity + reservation.quantity,
-                status=case(
-                    (FoodListing.status == ListingStatus.SOLD_OUT, ListingStatus.ACTIVE),
-                    else_=FoodListing.status
+                status=cast(
+                    case(
+                        (FoodListing.status == ListingStatus.SOLD_OUT, ListingStatus.ACTIVE.value),
+                        else_=FoodListing.status
+                    ),
+                    FoodListing.status.type
                 )
             )
         )
