@@ -28,9 +28,12 @@ def setup_test_db():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
 
+    import time
+    run_id = int(time.time())
+
     # Create dummy provider
     user = User(
-        email="concurrency_provider@test.com",
+        email=f"concurrency_provider_{run_id}@test.com",
         hashed_password="hashed_dummy_pw",
         full_name="Test Provider",
         role=UserRole.PROVIDER
@@ -53,7 +56,7 @@ def setup_test_db():
     test_consumers = []
     for i in range(50):
         c = User(
-            email=f"consumer_concurrency_{i}@test.com",
+            email=f"consumer_{run_id}_{i}@test.com",
             hashed_password="hashed_pw",
             full_name=f"Consumer {i}",
             role=UserRole.CONSUMER
