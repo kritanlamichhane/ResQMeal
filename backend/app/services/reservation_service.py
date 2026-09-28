@@ -33,7 +33,7 @@ class ReservationService:
                 detail="Quantity must be greater than zero."
             )
 
-        # 1. Acquire short-lived non-blocking mutex lock via Redis layer
+        # 1. Acquire short-lived non-blocking mutex lock via in-memory cache layer
         lock_name = f"reserve_listing_{listing_id}"
         acquired = cache_service.acquire_lock(lock_name, timeout_seconds=3)
         # Note: If lock isn't acquired immediately, atomic DB condition below remains the primary source of truth.
