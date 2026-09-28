@@ -106,13 +106,14 @@ def get_nearby_listings(
     radius_km: float = Query(10.0, ge=0.5, le=50.0),
     category: Optional[FoodCategory] = None,
     listing_type: Optional[ListingType] = None,
+    is_vegetarian: Optional[bool] = None,
     db: Session = Depends(get_db)
 ):
     """
     Geospatial discovery endpoint with caching.
     Uses spatial bounding box filtering in SQL + Haversine precision sorting.
     """
-    cache_key = f"nearby:{round(lat, 2)}:{round(lng, 2)}:{radius_km}:{category}:{listing_type}"
+    cache_key = f"nearby:{round(lat, 2)}:{round(lng, 2)}:{radius_km}:{category}:{listing_type}:{is_vegetarian}"
     cached_data = cache_service.get(cache_key)
     if cached_data:
         try:
@@ -135,6 +136,8 @@ def get_nearby_listings(
         query = query.filter(FoodListing.category == category)
     if listing_type:
         query = query.filter(FoodListing.listing_type == listing_type)
+    if is_vegetarian is not None:
+        query = query.filter(FoodListing.is_vegetarian == is_vegetarian)
 
     candidates = query.all()
 

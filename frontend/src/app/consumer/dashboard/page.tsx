@@ -45,7 +45,7 @@ function ConsumerDashboardContent() {
   const [search, setSearch] = useState(querySearch);
   const [selectedCategory, setSelectedCategory] = useState<FoodCategory | undefined>(undefined);
   const [radiusKm, setRadiusKm] = useState(10);
-  const [vegOnly, setVegOnly] = useState(false);
+  const [dietary, setDietary] = useState<'ALL' | 'VEG' | 'NON_VEG'>('ALL');
 
   // Keep state synchronized if URL search parameters change
   useEffect(() => {
@@ -60,11 +60,14 @@ function ConsumerDashboardContent() {
 
   const loadListings = (lat = userLat, lng = userLng) => {
     setIsLoading(true);
-    api.getNearbyListings(lat, lng, radiusKm, selectedCategory)
+    const isVegParam = dietary === 'ALL' ? undefined : dietary === 'VEG';
+    api.getNearbyListings(lat, lng, radiusKm, selectedCategory, isVegParam)
       .then((data) => {
         let filtered = data || [];
-        if (vegOnly) {
+        if (dietary === 'VEG') {
           filtered = filtered.filter((item: FoodListing) => item.is_vegetarian);
+        } else if (dietary === 'NON_VEG') {
+          filtered = filtered.filter((item: FoodListing) => !item.is_vegetarian);
         }
         if (search.trim()) {
           const q = search.toLowerCase();
@@ -82,7 +85,7 @@ function ConsumerDashboardContent() {
 
   useEffect(() => {
     loadListings(userLat, userLng);
-  }, [userLat, userLng, radiusKm, selectedCategory, vegOnly]);
+  }, [userLat, userLng, radiusKm, selectedCategory, dietary]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -176,19 +179,44 @@ function ConsumerDashboardContent() {
               />
             </div>
 
-            {/* Pure Veg Pill */}
-            <button
-              type="button"
-              onClick={() => setVegOnly(!vegOnly)}
-              className={`px-4 py-2.5 rounded-full text-xs font-bold border transition-all flex items-center gap-1.5 flex-shrink-0 ${
-                vegOnly 
-                  ? 'bg-black text-white border-black shadow-sm' 
-                  : 'bg-neutral-100 text-neutral-800 border-neutral-200 hover:bg-neutral-200'
-              }`}
-            >
-              <Leaf className={`w-3.5 h-3.5 ${vegOnly ? 'text-[#06C167]' : 'text-green-700'}`} />
-              Pure Veg
-            </button>
+            {/* Dietary Preference Segmented Pills */}
+            <div className="flex items-center p-1 bg-neutral-100 rounded-full border border-neutral-200 flex-shrink-0 text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => setDietary('ALL')}
+                className={`px-3 py-1.5 rounded-full transition-all ${
+                  dietary === 'ALL'
+                    ? 'bg-black text-white shadow-sm'
+                    : 'text-neutral-700 hover:text-black'
+                }`}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                onClick={() => setDietary('VEG')}
+                className={`px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 ${
+                  dietary === 'VEG'
+                    ? 'bg-emerald-700 text-white shadow-sm'
+                    : 'text-neutral-700 hover:text-black'
+                }`}
+              >
+                <Leaf className="w-3.5 h-3.5 text-emerald-400" />
+                Pure Veg
+              </button>
+              <button
+                type="button"
+                onClick={() => setDietary('NON_VEG')}
+                className={`px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 ${
+                  dietary === 'NON_VEG'
+                    ? 'bg-rose-700 text-white shadow-sm'
+                    : 'text-neutral-700 hover:text-black'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-rose-400" />
+                Non-Veg
+              </button>
+            </div>
 
           </div>
 
@@ -258,7 +286,7 @@ function ConsumerDashboardContent() {
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             <button
-              onClick={() => { setRadiusKm(25); setSelectedCategory(undefined); setVegOnly(false); setSearch(''); }}
+              onClick={() => { setRadiusKm(25); setSelectedCategory(undefined); setDietary('ALL'); setSearch(''); }}
               className="px-6 py-2.5 bg-black text-white hover:bg-neutral-800 text-xs font-bold rounded-full transition-all"
             >
               Expand to 25 km Radius

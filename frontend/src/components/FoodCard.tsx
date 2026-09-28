@@ -47,9 +47,15 @@ export function FoodCard({ listing, onReserve }: FoodCardProps) {
             </span>
           )}
 
-          {listing.is_vegetarian && (
-            <span className="px-2 py-0.5 bg-white/95 text-green-800 text-[10px] font-bold rounded-md border border-neutral-200">
-              🌱 Pure Veg
+          {listing.is_vegetarian ? (
+            <span className="px-2 py-0.5 bg-white/95 text-emerald-800 text-[10px] font-black rounded-md border border-emerald-200/80 flex items-center gap-1 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+              Pure Veg
+            </span>
+          ) : (
+            <span className="px-2 py-0.5 bg-white/95 text-rose-800 text-[10px] font-black rounded-md border border-rose-200/80 flex items-center gap-1 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-600" />
+              Non-Veg
             </span>
           )}
         </div>
