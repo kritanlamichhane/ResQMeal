@@ -265,20 +265,27 @@ npm run dev
 
 ## 10. Running Tests & Benchmarks
 
-### 1. Automated Concurrency Test
-Proves atomic inventory protection under 50 simultaneous threads:
+ResQMeal includes a complete automated test suite of **11 unit and integration tests** verifying concurrency invariants, geospatial algorithms, security, and API flows:
+
 ```bash
-cd backend
-pytest -v tests/test_concurrency_reservation.py
+# Run the entire test suite (all 11 tests pass in ~5s with zero external dependencies)
+pytest -v backend/tests/
 ```
 
-### 2. Full Test Suite (Auth, AI Models, Listings)
-```bash
-cd backend
-pytest -v tests/
-```
+### Test Coverage Highlights:
+1. **Multi-Threaded Concurrency Test (`test_concurrency_reservation.py`)**:
+   - Spawns 20 worker threads executing 50 concurrent reservation requests against a limited stock of 10 items.
+   - Proves exactly 10 requests succeed, 40 are rejected with `409 Conflict`, and final database inventory remains exactly 0 (no negative values).
+2. **Geospatial & Bounding Box Math (`test_geospatial.py`)**:
+   - Validates Haversine spherical distance calculations and spatial bounding box queries.
+3. **Core API Endpoints & Notifications (`test_api_endpoints.py`)**:
+   - Tests health checks, dietary filtering (`Pure Veg` vs `Non-Veg` separation), and full lifecycle of in-app notifications (retrieval, individual read, batch mark-all-read, unread badge counter).
+4. **Authentication & Cryptography (`test_auth.py`)**:
+   - Tests BCrypt salt hashing, timing attack resistance, and JWT token claims/decoding.
+5. **Machine Learning & Dynamic Pricing (`test_ai_services.py`)**:
+   - Verifies Random Forest regression metrics (MAE/RMSE/R²) and dynamic time-decay pricing curves.
 
-### 3. Load & Latency Benchmark Script
+### Automated Load & Stress Benchmark Script:
 ```bash
 python load_tests/concurrent_reservations_stress.py --url http://localhost:8000 --listing-id 1 --concurrency 25 --requests 50
 ```
