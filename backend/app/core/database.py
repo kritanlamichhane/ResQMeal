@@ -1,4 +1,6 @@
+import os
 import logging
+from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.exc import OperationalError
@@ -6,7 +8,16 @@ from app.core.config import settings
 
 logger = logging.getLogger("ResQMeal.Database")
 
+# Canonical fallback SQLite path inside backend directory
+BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+CANONICAL_SQLITE_PATH = (BACKEND_DIR / "resqmeal.db").as_posix()
+CANONICAL_SQLITE_URL = f"sqlite:///{CANONICAL_SQLITE_PATH}"
+
 db_url = settings.DATABASE_URL
+# Convert relative sqlite URL to canonical absolute path
+if db_url.startswith("sqlite") and ":///" in db_url and not os.path.isabs(db_url.split(":///", 1)[1]):
+    db_url = CANONICAL_SQLITE_URL
+
 connect_args = {}
 if db_url.startswith("sqlite"):
     connect_args = {"check_same_thread": False}
@@ -25,9 +36,9 @@ try:
 except (OperationalError, Exception) as exc:
     if not db_url.startswith("sqlite"):
         logger.warning(
-            f"Configured remote database is unreachable ({exc}). Falling back to local zero-setup SQLite engine: sqlite:///./resqmeal.db"
+            f"Configured remote database is unreachable ({exc}). Falling back to local zero-setup SQLite engine: {CANONICAL_SQLITE_URL}"
         )
-        db_url = "sqlite:///./resqmeal.db"
+        db_url = CANONICAL_SQLITE_URL
         connect_args = {"check_same_thread": False}
         engine = create_engine(
             db_url,
