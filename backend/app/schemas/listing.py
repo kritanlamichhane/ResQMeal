@@ -41,6 +41,8 @@ class FoodListingUpdate(BaseModel):
     pickup_end_time: Optional[datetime] = None
     status: Optional[ListingStatus] = None
 
+from pydantic import ConfigDict
+
 class ProviderSummary(BaseModel):
     id: int
     business_name: str
@@ -50,8 +52,7 @@ class ProviderSummary(BaseModel):
     latitude: float
     longitude: float
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class FoodListingResponse(FoodListingBase):
     id: int
@@ -63,8 +64,7 @@ class FoodListingResponse(FoodListingBase):
     provider: Optional[ProviderSummary] = None
     distance_km: Optional[float] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class PaginatedListingsResponse(BaseModel):
     items: List[FoodListingResponse]

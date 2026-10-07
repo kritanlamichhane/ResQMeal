@@ -45,6 +45,8 @@ class RegisterRequest(BaseModel):
     contact_person: Optional[str] = None
     daily_meal_capacity: Optional[int] = 100
 
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
+
 class UserResponse(BaseModel):
     id: int
     email: str
@@ -56,5 +58,4 @@ class UserResponse(BaseModel):
     provider_id: Optional[int] = None
     ngo_id: Optional[int] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

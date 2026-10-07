@@ -10,7 +10,6 @@ from app.models.reservation import Reservation, ReservationStatus
 from app.models.impact_log import ImpactLog
 
 def seed_database():
-    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
 
     # Check if already seeded

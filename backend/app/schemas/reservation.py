@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 from datetime import datetime
 from app.models.reservation import ReservationStatus
@@ -22,8 +22,7 @@ class ReservationResponse(BaseModel):
     created_at: datetime
     listing: Optional[FoodListingResponse] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class PickupConfirmationRequest(BaseModel):
     pickup_code: str

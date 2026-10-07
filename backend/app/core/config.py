@@ -36,6 +36,9 @@ class Settings(BaseSettings):
         """Parse comma-separated origin strings into a clean list for FastAPI CORS middleware."""
         return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",") if origin.strip()]
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=(".env", "backend/.env", "../backend/.env"),
+        extra="ignore"
+    )
 
 settings = Settings()
