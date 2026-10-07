@@ -4,11 +4,11 @@
   "description": "ResQMeal - Food Surplus Reduction Platform Workspace",
   "private": true,
   "scripts": {
-    "dev:backend": "powershell -Command \"& .\\venv\\Scripts\\python.exe -m uvicorn app.main:app --app-dir backend --reload --host 0.0.0.0 --port 8000\"",
+    "dev:backend": "python -m uvicorn app.main:app --app-dir backend --reload --host 0.0.0.0 --port 8000",
     "dev:frontend": "npm --prefix frontend run dev",
-    "dev": "npx concurrently -k -p \"[{name}]\" -n \"backend,frontend\" \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "test:backend": "powershell -Command \"& .\\venv\\Scripts\\pytest.exe -v backend/tests/\"",
-    "test:concurrency": "powershell -Command \"& .\\venv\\Scripts\\pytest.exe -v backend/tests/test_concurrency_reservation.py\""
+    "dev": "npx concurrently -k --kill-others-on-fail -p \"[{name}]\" -n \"backend,frontend\" -c \"cyan,magenta\" \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "test:backend": "pytest -v backend/tests/",
+    "test:concurrency": "pytest -v backend/tests/test_concurrency_reservation.py"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
